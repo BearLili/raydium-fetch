@@ -5,5 +5,19 @@
     "pairKeys": "EP2ib6dYdEeqD8MfE2ezHCxX3kP3K2eLKkirfPm5eyMx",
     "base": "WIF",
     "quote": "SOL"
+  },
+  {
+    "tokenAmount": 10000,
+    "slip": 1,
+    "pairKeys": "DSUvc5qf5LJHHV5e2tD184ixotSnCnwj7i4jJa4Xsrmt",
+    "base": "BOME",
+    "quote": "SOL"
+  },
+  {
+    "tokenAmount": 1000,
+    "slip": 1,
+    "pairKeys": "AgFnRLUScRD2E4nWQxW73hdbSN7eKEUb2jHX7tx9YTYc",
+    "base": "SLERF",
+    "quote": "SOL"
   }
 ]
