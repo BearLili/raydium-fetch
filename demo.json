@@ -1,0 +1,61 @@
+{
+    "blockNumber": 37651932,
+    "ts": 1712494596290,
+    "chainName": "bsc",
+    "value": [
+        {
+            "pairAddress": "0x8146Fbe70F531a40c4daE7299c7A7EB71750A63A",
+            "pairFee": 0,
+            "asks": [
+                [
+                    0.05325677676913079,
+                    4000,
+                    1712494392
+                ]
+            ],
+            "bids": [
+                [
+                    0.05286333545232574,
+                    4000,
+                    1712494392
+                ]
+            ],
+            "pair": [
+                "LAI",
+                "USDT",
+                "175999738379728500002278",
+                "3317021387790805349239895"
+            ],
+            "baseCurrency": "LAI",
+            "quoteCurrency": "USDT",
+            "timestamp": 1712494392,
+            "sequence": 1712494392,
+            "connector": "pancakeswap",
+            "symbol": "LAI/USDT"
+        },
+        {
+            "pairAddress": "0xb2E7dA5063CAaf0319427EACB1AD602F2767F80C",
+            "pairFee": 2500,
+            "asks": [
+                [
+                    0.05320757947794961,
+                    4000,
+                    1712494596291
+                ]
+            ],
+            "bids": [
+                [
+                    0.05282505368724334,
+                    4000,
+                    1712494596291
+                ]
+            ],
+            "baseCurrency": "LAI",
+            "quoteCurrency": "USDT",
+            "timestamp": 1712494596291,
+            "sequence": 1712494596291,
+            "connector": "pancakeswapv3",
+            "symbol": "LAI/USDT"
+        }
+    ]
+}

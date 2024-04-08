@@ -46,7 +46,6 @@ export async function compute(
       //   false
       // );
 
-      
       const currency = new Token(curr_out, out_decimal);
       const slippage = new Percent(slip, 100);
       return { amount, currency, slippage };
