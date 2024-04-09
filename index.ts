@@ -28,7 +28,11 @@ async function main() {
   }
 }
 
-async function fetchToken(pool_keys_array, token_obj, connection) {
+async function fetchToken(
+  pool_keys_array: any,
+  token_obj: any,
+  connection: any
+) {
   // every public key into computer to back PriceInfo
   const computations = pool_keys_array.map(async (pool_keys, idx) => {
     const { baseMint, quoteMint } = pool_keys;
@@ -44,8 +48,8 @@ async function fetchToken(pool_keys_array, token_obj, connection) {
       const result = await compute(
         connection,
         pool_keys,
-        token_in_key,
-        token_out_key,
+        token_in_key, // baseMint
+        token_out_key, // quoteMint
         token_obj?.[idx]?.tokenAmount,
         token_obj?.[idx]?.slip
       );
@@ -162,7 +166,12 @@ function logTokenInfo(computation: any, tokenInfo: any, transType: string) {
 }
 
 // bot need's data
-function priceDataTransfer(result, tokenInfo, tokenJson, timestamp) {
+function priceDataTransfer(
+  result: any,
+  tokenInfo: any,
+  tokenJson: any,
+  timestamp: any
+) {
   const { token_in_key, token_out_key, token_in_label, token_out_label } =
     tokenInfo;
   let asksInfo = result?.[0] || {};

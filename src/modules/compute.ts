@@ -26,7 +26,7 @@ export async function compute(
       //setting up decimals
       let in_decimal: number;
       let out_decimal: number;
-      // console.log(curr_in.toBase58() + "|" + curr_out.toBase58());
+      console.log(curr_in.toBase58() + "|" + curr_out.toBase58());
       if (curr_in.toBase58() === poolKeys.baseMint.toBase58()) {
         in_decimal = poolInfo.baseDecimals;
         out_decimal = poolInfo.quoteDecimals;
@@ -35,18 +35,17 @@ export async function compute(
         in_decimal = poolInfo.quoteDecimals;
       }
 
+      // base
       const amount = new TokenAmount(
         new Token(curr_in, in_decimal),
         amount_in,
         false
       );
-      // const amount = new CurrencyAmount(
-      //   new Token(curr_in, in_decimal),
-      //   amount_in,
-      //   false
-      // );
 
+      // quote
       const currency = new Token(curr_out, out_decimal);
+
+      // slippage
       const slippage = new Percent(slip, 100);
       return { amount, currency, slippage };
     };
