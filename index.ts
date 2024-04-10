@@ -22,102 +22,104 @@ async function main() {
     const pool_keys_array = await fetchPoolKeys(connection, publicKeyArr);
 
     // do fetching
-    await fetchToken(pool_keys_array, token_obj, connection);
+    // setInterval(
+    //   () => fetchPoolInfo(pool_keys_array, token_obj, connection),
+    //   2000
+    // );
+    //
+    await fetchPoolInfo(pool_keys_array, token_obj, connection);
   } catch (error) {
     console.error("Error during computations:", error);
   }
 }
 
-// get Pool_Info 
-async function fetchToken(
+// get fetchPoolInfo
+async function fetchPoolInfo(
   pool_keys_array: any,
   token_obj: any,
   connection: any
 ) {
-  // every public key into computer to back PriceInfo
-  const computations = pool_keys_array.map(async (pool_keys: any, idx: any) => {
-    // pool_keys MintInfo
-    const { baseMint, quoteMint } = pool_keys;
-    // Json about TokenObj
-    const tokenJson = token_obj?.[idx] || {};
-    //
-    const tokenInfo = {
-      baseMint, //
-      quoteMint, //
-      base: tokenJson?.base, // baseName
-      quote: tokenJson?.quote, // quoteName
+  try {
+    // every public key into computer to back PriceInfo
+    let new_pool_keys_array = pool_keys_array.map(
+      (pool_keys: any, idx: any) => {
+        // pool_keys MintInfo
+        const { baseMint, quoteMint } = pool_keys;
+        // Json about TokenObj
+        const tokenJson = token_obj?.[idx] || {};
+        //
+        const tokenInfo = {
+          baseMint, //
+          quoteMint, //
+          base: tokenJson?.base, // baseName
+          quote: tokenJson?.quote, // quoteName
+        };
+        return {
+          pool_keys,
+          tokenInfo,
+          tokenJson,
+        };
+      }
+    );
+
+    // start Time
+    let beginCompute = new Date().getTime();
+    const results = await compute(
+      connection,
+      pool_keys_array,
+      new_pool_keys_array
+    );
+
+    let value = [];
+
+    results.forEach(({ result, tokenInfo, tokenJson, timestamp }, idx) => {
+      // output data - End
+      value.push(priceDataTransfer(result, tokenJson, timestamp));
+      return;
+      //
+      // - log -
+      console.log(
+        chalk.cyanBright(
+          `\n [${idx + 1}]【${tokenJson?.base}/${tokenJson?.quote}】: ${
+            tokenJson?.tokenAmount
+          }|${tokenJson?.base}`
+        )
+      );
+      result.forEach((i: any, idx: any) => {
+        logTokenInfo(i, tokenInfo, tokenJson, idx > 0);
+      });
+      // - - - -
+      console.log(chalk.cyanBright(`\n -------------------------------------`));
+    });
+
+    // end Time
+    let endTime = new Date().getTime();
+
+    const hash_info = (await connection.getLatestBlockhashAndContext()).value;
+    let lastValidBlockHeight = hash_info.lastValidBlockHeight;
+
+    // pushData
+    const pushData = {
+      blockNumber: lastValidBlockHeight,
+      ts: endTime,
+      chainName: "sol",
+      value,
     };
     //
-    try {
-      return {
-        result: await compute(
-          connection,
-          pool_keys,
-          tokenInfo?.baseMint, // baseMint
-          tokenInfo?.quoteMint, // quoteMint
-          tokenJson.tokenAmount,
-          tokenJson.slip
-        ), // compute Result
-        tokenInfo, // Pool Mint info
-        tokenJson, // include amountNum\slip ...
-        timestamp: new Date().getTime(),
-      };
-    } catch (error) {
-      console.error(`Error computing for pool ${idx + 1}:`, error);
-      throw error;
-    }
-  });
 
-  // beginCompute time
-  let beginCompute = new Date().getTime();
-
-  // waiting for all computations finished
-  const results = await Promise.all(computations);
-
-  // console.log
-  let value = [];
-
-  results.forEach(({ result, tokenInfo, tokenJson, timestamp }, idx) => {
-    // output data - End
-    value.push(priceDataTransfer(result, tokenJson, timestamp));
-    //
-    // - log -
     console.log(
-      chalk.cyanBright(
-        `\n [${idx + 1}]【${tokenJson?.base}/${tokenJson?.quote}】: ${
-          tokenJson?.tokenAmount
-        }|${tokenJson?.base}`
-      )
+      `\n`,
+      chalk.bgMagentaBright("cost", endTime - beginCompute, "ms")
     );
-    result.forEach((i: any, idx: any) => {
-      logTokenInfo(i, tokenInfo, tokenJson, idx > 0);
-    });
-    // - - - -
-    console.log(chalk.cyanBright(`\n -------------------------------------`));
-  });
 
-  let endTime = new Date().getTime();
-
-  const hash_info = (await connection.getLatestBlockhashAndContext()).value;
-  let lastValidBlockHeight = hash_info.lastValidBlockHeight;
-
-  // pushData
-  const pushData = {
-    blockNumber: lastValidBlockHeight,
-    ts: endTime,
-    chainName: "sol",
-    value,
-  };
-  //
-
-  console.log(
-    `\n`,
-    chalk.bgMagentaBright("cost", endTime - beginCompute, "ms")
-  );
-
-  //
-  console.log(`\n`);
-  console.dir(pushData, { depth: null, colors: true });
+    //
+    console.log(`\n`);
+    console.dir(pushData, { depth: null, colors: true });
+    // End
+    await fetchPoolInfo(pool_keys_array, token_obj, connection);
+  } catch (err) {
+    main()
+  }
 }
 
 // logger function
@@ -214,4 +216,3 @@ function priceDataTransfer(result: any, tokenJson: any, timestamp: any) {
 function pushData() {}
 
 main();
-// setInterval(main, 5000);

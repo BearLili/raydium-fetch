@@ -13,16 +13,23 @@ import {
 
 export async function compute(
   connection: Connection,
-  poolKeys: any,
-  curr_in: PublicKey,
-  curr_out: PublicKey,
-  amount_in: number,
-  slip: number
+  poolKeysList: any,
+  new_pool_keys_array: any
+  // curr_in: PublicKey,
+  // curr_out: PublicKey,
+  // amount_in: number,
+  // slip: number
 ) {
   try {
-    const poolInfo = await Liquidity.fetchInfo({ connection, poolKeys });
-    //
-    const computeDataMaker = (poolInfo: any, curr_in: any, curr_out: any) => {
+    // computeDataMaker
+    const computeDataMaker = (
+      poolInfo: any,
+      curr_in: any,
+      curr_out: any,
+      slip: any,
+      amount_in: any,
+      poolKeys: any
+    ) => {
       //setting up decimals
       let in_decimal: number;
       let out_decimal: number;
@@ -50,39 +57,70 @@ export async function compute(
       return { amount, currency, slippage };
     };
     //
-    const { amount, currency, slippage } = computeDataMaker(
-      poolInfo,
-      curr_in,
-      curr_out
-    );
-    //
-    return [
-      // bids
-      Object.values({
-        ...Liquidity.computeAmountOut({
-          poolKeys,
-          poolInfo,
-          amountIn: amount,
-          currencyOut: currency,
-          slippage: slippage,
-        }),
-        amount,
-      }),
 
-      // asks
-      Object.values({
-        ...Liquidity.computeAmountIn({
-          poolKeys,
+    // start fetchMultipleInfo
+    const poolInfoList = await Liquidity.fetchMultipleInfo({
+      connection,
+      pools: poolKeysList,
+    });
+    //
+
+    // each for computing
+    const computeResultList =
+      poolInfoList?.length &&
+      poolInfoList.map((poolInfo, idx) => {
+        let curr_in = new_pool_keys_array?.[idx]?.tokenInfo?.baseMint; // baseMint
+        let curr_out = new_pool_keys_array?.[idx]?.tokenInfo?.quoteMint; // quoteMint
+        let slip = new_pool_keys_array?.[idx]?.tokenJson?.slip; // slip
+        let amount_in = new_pool_keys_array?.[idx]?.tokenJson?.tokenAmount; // slip
+
+        //
+        const { amount, currency, slippage } = computeDataMaker(
           poolInfo,
-          amountOut: amount,
-          currencyIn: currency,
-          slippage: slippage,
-        }),
-        fee: null,
-        amount,
-      }),
-    ];
+          curr_in,
+          curr_out,
+          slip,
+          amount_in,
+          poolKeysList?.[idx]
+        );
+        //
+        return {
+          result: [
+            // bids
+            Object.values({
+              ...Liquidity.computeAmountOut({
+                poolKeys: poolKeysList?.[idx],
+                poolInfo,
+                amountIn: amount,
+                currencyOut: currency,
+                slippage: slippage,
+              }),
+              amount,
+            }),
+
+            // asks
+            Object.values({
+              ...Liquidity.computeAmountIn({
+                poolKeys: poolKeysList?.[idx],
+                poolInfo,
+                amountOut: amount,
+                currencyIn: currency,
+                slippage: slippage,
+              }),
+              fee: null,
+              amount,
+            }),
+          ],
+          tokenInfo: new_pool_keys_array?.[idx]?.tokenInfo,
+          tokenJson: new_pool_keys_array?.[idx]?.tokenJson,
+          timestamp: new Date().getTime(),
+        };
+      });
+    //
+
+    return computeResultList;
   } catch (e) {
-    return 1;
+    console.error("compute error", e);
+    return [];
   }
 }
