@@ -26,7 +26,7 @@ export async function compute(
       //setting up decimals
       let in_decimal: number;
       let out_decimal: number;
-      console.log(curr_in.toBase58() + "|" + curr_out.toBase58());
+      // console.log(curr_in.toBase58() + "|" + curr_out.toBase58());
       if (curr_in.toBase58() === poolKeys.baseMint.toBase58()) {
         in_decimal = poolInfo.baseDecimals;
         out_decimal = poolInfo.quoteDecimals;
@@ -50,51 +50,33 @@ export async function compute(
       return { amount, currency, slippage };
     };
     //
-
-    const computeAmountOut_data = computeDataMaker(poolInfo, curr_in, curr_out);
-    const computeAmountOut = Liquidity.computeAmountOut({
-      poolKeys,
+    const { amount, currency, slippage } = computeDataMaker(
       poolInfo,
-      amountIn: computeAmountOut_data?.amount,
-      currencyOut: computeAmountOut_data?.currency,
-      slippage: computeAmountOut_data?.slippage,
-    });
-
-    const computeAmountIn_data = computeDataMaker(poolInfo, curr_in, curr_out);
-    const computeAmountIn = Liquidity.computeAmountIn({
-      poolKeys,
-      poolInfo,
-      amountOut: computeAmountIn_data?.amount,
-      currencyIn: computeAmountIn_data?.currency,
-      slippage: computeAmountIn_data?.slippage,
-    });
-
-    // const computeAmountIn_buy_data = computeDataMaker(
-    //   poolInfo,
-    //   curr_out,
-    //   curr_in
-    // );
-    // const computeAmountOut_buy = Liquidity.computeAmountOut({
-    //   poolKeys,
-    //   poolInfo,
-    //   amountIn: computeAmountIn_buy_data?.amount,
-    //   currencyOut: computeAmountIn_buy_data?.currency,
-    //   slippage: computeAmountIn_buy_data?.slippage,
-    // });
-
+      curr_in,
+      curr_out
+    );
+    //
     return [
       Object.values({
-        ...computeAmountOut,
-        amount: computeAmountOut_data?.amount,
+        ...Liquidity.computeAmountOut({
+          poolKeys,
+          poolInfo,
+          amountIn: amount,
+          currencyOut: currency,
+          slippage: slippage,
+        }),
+        amount,
       }),
-      // Object.values({
-      //   ...computeAmountOut_buy,
-      //   amount: computeAmountOut_data?.amount,
-      // }),
       Object.values({
-        ...computeAmountIn,
+        ...Liquidity.computeAmountIn({
+          poolKeys,
+          poolInfo,
+          amountOut: amount,
+          currencyIn: currency,
+          slippage: slippage,
+        }),
         fee: null,
-        amount: computeAmountIn_data?.amount,
+        amount,
       }),
     ];
   } catch (e) {
