@@ -57,6 +57,7 @@ export async function compute(
     );
     //
     return [
+      // bids
       Object.values({
         ...Liquidity.computeAmountOut({
           poolKeys,
@@ -67,6 +68,8 @@ export async function compute(
         }),
         amount,
       }),
+
+      // asks
       Object.values({
         ...Liquidity.computeAmountIn({
           poolKeys,

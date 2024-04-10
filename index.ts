@@ -28,6 +28,7 @@ async function main() {
   }
 }
 
+// get Pool_Info 
 async function fetchToken(
   pool_keys_array: any,
   token_obj: any,
@@ -77,8 +78,10 @@ async function fetchToken(
   let value = [];
 
   results.forEach(({ result, tokenInfo, tokenJson, timestamp }, idx) => {
+    // output data - End
     value.push(priceDataTransfer(result, tokenJson, timestamp));
     //
+    // - log -
     console.log(
       chalk.cyanBright(
         `\n [${idx + 1}]【${tokenJson?.base}/${tokenJson?.quote}】: ${
@@ -86,11 +89,10 @@ async function fetchToken(
         }|${tokenJson?.base}`
       )
     );
-    //
     result.forEach((i: any, idx: any) => {
       logTokenInfo(i, tokenInfo, tokenJson, idx > 0);
     });
-    //
+    // - - - -
     console.log(chalk.cyanBright(`\n -------------------------------------`));
   });
 
@@ -114,8 +116,8 @@ async function fetchToken(
   );
 
   //
-  // console.log(`\n`);
-  // console.dir(pushData, { depth: null, colors: true });
+  console.log(`\n`);
+  console.dir(pushData, { depth: null, colors: true });
 }
 
 // logger function
@@ -140,14 +142,15 @@ function logTokenInfo(
 
   console.log(logColor(`\n【${isBuy ? "Asks" : "Bids"}】`));
 
+  let mathPrice = amountOut.toFixed() / tokenJson?.tokenAmount;
+
+  console.log(chalk.blueBright(`\t计算价格: ${mathPrice.toFixed(9)}|${quote}`));
+
   console.log(
     `\t当前价格: ${
       isBuy ? currentPrice.invert().toFixed() : currentPrice.toFixed()
     }|${quote}`
   );
-
-  let mathPrice = amountOut.toFixed() / tokenJson?.tokenAmount;
-  console.log(chalk.blueBright(`\t计算价格: ${mathPrice.toFixed(9)}|${quote}`));
 
   console.log(
     chalk.yellowBright(
@@ -164,20 +167,20 @@ function logTokenInfo(
     }: ${executionAmountOut.toFixed()}|${quote}`
   );
 
-  // if (fee) console.log(`\t手续费: ${fee?.toFixed()}%`);
+  if (fee) console.log(`\t手续费: ${fee?.toFixed()}%`);
 
-  // if (priceImpact.toFixed() > 5) {
-  //   console.log(chalk.red(`\t价格影响: ${priceImpact.toFixed()}`));
-  // } else if (priceImpact.toFixed() < 5 && priceImpact.toFixed() > 1) {
-  //   console.log(chalk.yellowBright(`\t价格影响: ${priceImpact.toFixed()}`));
-  // } else {
-  //   console.log(chalk.green(`\t价格影响: ${priceImpact.toFixed()}`));
-  // }
+  if (priceImpact.toFixed() > 5) {
+    console.log(chalk.red(`\t价格影响: ${priceImpact.toFixed()}`));
+  } else if (priceImpact.toFixed() < 5 && priceImpact.toFixed() > 1) {
+    console.log(chalk.yellowBright(`\t价格影响: ${priceImpact.toFixed()}`));
+  } else {
+    console.log(chalk.green(`\t价格影响: ${priceImpact.toFixed()}`));
+  }
 }
 
 // bot need's data
 function priceDataTransfer(result: any, tokenJson: any, timestamp: any) {
-  let [asksInfo, bidsInfo] = result || [[], []];
+  let [bidsInfo, asksInfo] = result || [[], []];
   // [
   //   amountOut,
   //   minAmountOut,
@@ -187,13 +190,15 @@ function priceDataTransfer(result: any, tokenJson: any, timestamp: any) {
   //   fee,
   //   amountIn,
   // ];
+
+  let bidsPrice = bidsInfo?.[0]?.toFixed() / tokenJson?.tokenAmount;
+  let asksPrice = asksInfo?.[0]?.toFixed() / tokenJson?.tokenAmount;
+
   let resultTokenInfo = {
     pairAddress: tokenJson?.pairKeys,
-    pairFee: asksInfo?.[5]?.toFixed(),
-    asks: [[asksInfo?.[3]?.toFixed(), asksInfo?.[6]?.toFixed(), timestamp]],
-    bids: [
-      [bidsInfo?.[3]?.invert()?.toFixed(), bidsInfo?.[6]?.toFixed(), timestamp],
-    ],
+    pairFee: bidsInfo?.[5]?.toFixed(),
+    asks: [[asksPrice?.toFixed(9), tokenJson?.tokenAmount, timestamp]],
+    bids: [[bidsPrice?.toFixed(9), tokenJson?.tokenAmount, timestamp]],
     pair: [tokenJson?.base, tokenJson?.quote, "token_in_key", "token_out_key"],
     baseCurrency: tokenJson?.base,
     quoteCurrency: tokenJson?.quote,
