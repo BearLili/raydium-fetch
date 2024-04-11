@@ -1,11 +1,5 @@
 [
-  {
-    "tokenAmount": 100,
-    "slip": 0,
-    "pairKeys": "EP2ib6dYdEeqD8MfE2ezHCxX3kP3K2eLKkirfPm5eyMx",
-    "base": "WIF",
-    "quote": "SOL"
-  },
+ 
   {
     "tokenAmount": 10000,
     "slip": 0,
@@ -26,5 +20,19 @@
     "pairKeys": "DVa7Qmb5ct9RCpaU7UTpSaf3GVMYz17vNVU67XpdCRut",
     "base": "RAY",
     "quote": "USDT"
+  },
+  {
+    "tokenAmount": 100,
+    "slip": 0,
+    "pairKeys": "EP2ib6dYdEeqD8MfE2ezHCxX3kP3K2eLKkirfPm5eyMx",
+    "base": "WIF",
+    "quote": "SOL"
+  },
+  {
+    "tokenAmount": 10000,
+    "slip": 0,
+    "pairKeys": "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce",
+    "base": "MEW",
+    "quote": "SOL"
   }
 ]

@@ -8,6 +8,13 @@ const {
   TokenAmount,
 } = require("@raydium-io/raydium-sdk");
 const chalk = require("chalk");
+const redis = require("redis");
+
+const chainName = "sol";
+const bookPrefix = "amm:";
+
+// redis
+let redisClient;
 
 // Json data
 const config_tokenArr =
@@ -15,6 +22,8 @@ const config_tokenArr =
 
 // init
 async function init() {
+  redisClient = redis.createClient({ url: config.redisUrl });
+  await redisClient.connect();
   // base config
   const connection = new Connection("https://api.mainnet-beta.solana.com/");
   // token List
@@ -172,6 +181,8 @@ async function fetchPoolInfo(pool_keys_array, config_tokenArr, connection) {
       chainName: "sol",
       value,
     };
+    // pushing
+    pushToRedis(pushData);
     //
     console.log(`\n`);
     console.dir(pushData, { depth: null, colors: true });
@@ -185,7 +196,6 @@ async function fetchPoolInfo(pool_keys_array, config_tokenArr, connection) {
 
     // new Fetch
     await fetchPoolInfo(pool_keys_array, config_tokenArr, connection);
-    
   } catch (err) {
     main();
   }
@@ -290,8 +300,12 @@ function priceDataTransfer(result, tokenJson, timestamp) {
 }
 
 // push to redis;
-function pushData() {}
+function pushToRedis(data) {
+  const channel = `${bookPrefix}${chainName}`;
+//   redisClient.setEx(channel, 60, JSON.stringify(data));
+}
 
+// main
 async function main() {
   try {
     const { pool_keys_array, connection } = await init();

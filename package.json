@@ -23,6 +23,7 @@
     "request": "^2.88.2",
     "requests": "^0.3.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "redis": "^4.6.6"
   }
 }
