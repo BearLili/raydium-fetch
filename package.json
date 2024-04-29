@@ -21,6 +21,7 @@
     "hwid": "^0.3.0",
     "koa": "^2.15.3",
     "koa-bodyparser": "^4.4.1",
+    "koa-helmet": "^7.0.2",
     "koa-logger": "^3.2.1",
     "log4js": "^6.9.1",
     "moment": "^2.29.4",
