@@ -1,7 +1,7 @@
 const Koa = require("koa");
 const bodyParser = require("koa-bodyparser");
 const WebSocket = require("ws");
-const logger = require("koa-logger");
+const log4js = require("log4js");
 
 const app = new Koa();
 const PORT = process.env.PORT || 3000;
