@@ -2,9 +2,13 @@ const Koa = require("koa");
 const bodyParser = require("koa-bodyparser");
 const WebSocket = require("ws");
 const log4js = require("log4js");
-//
+const helmet = require("koa-helmet");
+
 const app = new Koa();
 const PORT = process.env.PORT || 3000;
+
+// 使用 Helmet 中间件增加 HTTP 头部安全性
+app.use(helmet());
 
 // 使用 bodyParser 中间件解析请求体
 app.use(bodyParser());
@@ -35,7 +39,7 @@ log4js.configure({
 });
 
 // create logger
-logger = log4js.getLogger("default");
+const logger = log4js.getLogger("default");
 
 // 创建 HTTP 服务器
 const server = app.listen(PORT, () => {
@@ -59,7 +63,7 @@ wss.on("connection", (ws) => {
 
   // 监听连接关闭事件
   ws.on("close", () => {
-    logger.log("WebSocket client disconnected");
+    logger.error("WebSocket client disconnected");
   });
 });
 
@@ -70,15 +74,22 @@ app.use(async (ctx) => {
     const webhookData = ctx.request.body;
     logger.log("Received time:", new Date().getTime()); // 打印接收到推送信息的时间
     // 在此处处理 webhook 数据，你可以将它发送给你的 bot 或执行其他操作
-    // logger.info(
-    //   `Received webhook data from Helius: ${JSON.stringify(webhookData)}`
-    // );
+    logger.info(
+      `Received webhook data from Helius: ${JSON.stringify(webhookData)}`
+    );
     // 将接收到的数据发送给 WebSocket 客户端（即你的 bot）
     wss.clients.forEach((client) => {
-      logger.info('Clients',client)
-      // if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(webhookData));
-      // }
+      if (client.readyState === WebSocket.OPEN) {
+        let data = webhookData[0] || {};
+        client.send(
+          JSON.stringify({
+            description: data.description,
+            signature: data.signature,
+            source: data.source,
+            timestamp: data.timestamp,
+          })
+        );
+      }
     });
 
     // 响应 Helius，表示已成功接收到数据
