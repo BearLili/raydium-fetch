@@ -75,9 +75,9 @@ app.use(async (ctx) => {
     );
     // 将接收到的数据发送给 WebSocket 客户端（即你的 bot）
     wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
+      // if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(webhookData));
-      }
+      // }
     });
 
     // 响应 Helius，表示已成功接收到数据
