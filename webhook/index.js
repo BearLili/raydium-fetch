@@ -75,6 +75,7 @@ app.use(async (ctx) => {
     );
     // 将接收到的数据发送给 WebSocket 客户端（即你的 bot）
     wss.clients.forEach((client) => {
+      logger.info('Clients',client)
       // if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(webhookData));
       // }
