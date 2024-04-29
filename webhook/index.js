@@ -88,6 +88,7 @@ app.use(async (ctx) => {
             signature: data.signature,
             source: data.source,
             timestamp: data.timestamp,
+            slot: data.slot,
           })
         );
       }
