@@ -2,7 +2,7 @@ const Koa = require("koa");
 const bodyParser = require("koa-bodyparser");
 const WebSocket = require("ws");
 const log4js = require("log4js");
-
+//
 const app = new Koa();
 const PORT = process.env.PORT || 3000;
 
@@ -66,19 +66,19 @@ wss.on("connection", (ws) => {
 // POST 请求处理程序，用于接收来自 Helius 的 webhook 数据
 app.use(async (ctx) => {
   if (ctx.method === "POST" && ctx.path === "/webhook") {
-    // 记录接收到推送信息的时间
-    const receivedTime = new Date().toISOString();
-    const _receivedTime = new Date().getTime();
-
     // 获取来自 Helius 的 webhook 数据
     const webhookData = ctx.request.body;
-
+    logger.log("Received time:", new Date().getTime()); // 打印接收到推送信息的时间
     // 在此处处理 webhook 数据，你可以将它发送给你的 bot 或执行其他操作
     logger.info(
       `Received webhook data from Helius: ${JSON.stringify(webhookData)}`
     );
-
-    logger.log("Received time:", receivedTime, _receivedTime); // 打印接收到推送信息的时间
+    // 将接收到的数据发送给 WebSocket 客户端（即你的 bot）
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(webhookData));
+      }
+    });
 
     // 响应 Helius，表示已成功接收到数据
     ctx.status = 200;
