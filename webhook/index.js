@@ -14,7 +14,7 @@ app.use(async (ctx) => {
     const webhookData = ctx.request.body;
     
     // 在此处处理 webhook 数据，你可以将它发送给你的 bot 或执行其他操作
-    console.log('Received webhook data from Helius:', webhookData);
+    console.log('Received webhook data from Helius:', JSON.stringify(webhookData));
     
     // 响应 Helius，表示已成功接收到数据
     ctx.status = 200;
