@@ -9,20 +9,37 @@ const PORT = process.env.PORT || 3000;
 // 使用 bodyParser 中间件解析请求体
 app.use(bodyParser());
 
-// 使用 logger 中间件记录请求日志
-app.use(
-  logger({
-    format: ":method :url - :status - :response-time ms", // 自定义日志格式
-    transports: {
-      file: "path/to/logfile.log", // 将日志输出到文件
+// log config
+log4js.configure({
+  appenders: {
+    console: {
+      type: "stdout",
+      layout: {
+        type: "pattern",
+        pattern: "%[%d%] %m",
+      },
     },
-    json: true, // 将日志以 JSON 格式输出
-  })
-);
+    file: {
+      type: "file",
+      filename: `./logs/fetch-price.log`,
+      maxLogSize: 52428800,
+      backups: 5,
+    },
+  },
+  categories: {
+    default: {
+      appenders: ["console", "file"],
+      level: "info",
+    },
+  },
+});
+
+// create logger
+logger = log4js.getLogger("default");
 
 // 创建 HTTP 服务器
 const server = app.listen(PORT, () => {
-  console.log(`HTTP Server is running on port ${PORT}`);
+  logger.log(`HTTP Server is running on port ${PORT}`);
 });
 
 // 创建 WebSocket 服务器
@@ -30,11 +47,11 @@ const wss = new WebSocket.Server({ server });
 
 // WebSocket 连接建立时的处理逻辑
 wss.on("connection", (ws) => {
-  console.log("WebSocket client connected");
+  logger.log("WebSocket client connected");
 
   // 接收消息
   ws.on("message", (message) => {
-    console.log("Received message from WebSocket client:", message);
+    logger.log("Received message from WebSocket client:", message);
 
     // 处理消息，并发送响应
     ws.send("Received your message: " + message);
@@ -42,7 +59,7 @@ wss.on("connection", (ws) => {
 
   // 监听连接关闭事件
   ws.on("close", () => {
-    console.log("WebSocket client disconnected");
+    logger.log("WebSocket client disconnected");
   });
 });
 
@@ -57,11 +74,11 @@ app.use(async (ctx) => {
     const webhookData = ctx.request.body;
 
     // 在此处处理 webhook 数据，你可以将它发送给你的 bot 或执行其他操作
-    console.log(
-      "Received webhook data from Helius:",
-      JSON.stringify(webhookData)
+    logger.info(
+      `Received webhook data from Helius: ${JSON.stringify(webhookData)}`
     );
-    console.log("Received time:", receivedTime, _receivedTime); // 打印接收到推送信息的时间
+
+    logger.log("Received time:", receivedTime, _receivedTime); // 打印接收到推送信息的时间
 
     // 响应 Helius，表示已成功接收到数据
     ctx.status = 200;
