@@ -83,6 +83,7 @@ app.use(async (ctx) => {
         let data = webhookData[0] || {};
         client.send(
           JSON.stringify({
+            serverTime: new Date().getTime(),
             description: data.description,
             signature: data.signature,
             source: data.source,
