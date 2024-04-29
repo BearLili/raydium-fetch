@@ -70,9 +70,9 @@ app.use(async (ctx) => {
     const webhookData = ctx.request.body;
     logger.log("Received time:", new Date().getTime()); // 打印接收到推送信息的时间
     // 在此处处理 webhook 数据，你可以将它发送给你的 bot 或执行其他操作
-    logger.info(
-      `Received webhook data from Helius: ${JSON.stringify(webhookData)}`
-    );
+    // logger.info(
+    //   `Received webhook data from Helius: ${JSON.stringify(webhookData)}`
+    // );
     // 将接收到的数据发送给 WebSocket 客户端（即你的 bot）
     wss.clients.forEach((client) => {
       logger.info('Clients',client)
